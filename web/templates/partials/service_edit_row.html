@@ -1,0 +1,22 @@
+{{define "service_edit_row"}}
+<tr id="service-row-{{.ID}}">
+  <td><input type="text" name="name" value="{{.Name}}" required style="min-width:120px;"></td>
+  <td><input type="text" name="category" value="{{.Category}}" style="min-width:90px;"></td>
+  <td><textarea name="description" style="min-width:140px;min-height:50px;">{{deref .Description}}</textarea></td>
+  <td>
+    <input type="number" name="price_min" value="{{derefFloat .PriceMin}}" step="0.01" min="0" style="width:80px;">
+    <input type="number" name="price_max" value="{{derefFloat .PriceMax}}" step="0.01" min="0" style="width:80px;">
+  </td>
+  <td>
+    <button class="btn-sm"
+      hx-include="closest tr"
+      hx-put="/dashboard/clinics/{{.ClinicID}}/services/{{.ID}}"
+      hx-target="#service-row-{{.ID}}"
+      hx-swap="outerHTML">Save</button>
+    <button class="btn-sm outline secondary"
+      hx-get="/dashboard/clinics/{{.ClinicID}}/services/{{.ID}}"
+      hx-target="#service-row-{{.ID}}"
+      hx-swap="outerHTML">Cancel</button>
+  </td>
+</tr>
+{{end}}

@@ -1,0 +1,24 @@
+{{define "faq_edit_row"}}
+<tr id="faq-row-{{.ID}}">
+  <td>
+    <input type="text" name="category" value="{{.Category}}" style="min-width:90px;">
+  </td>
+  <td>
+    <input type="text" name="question" value="{{.Question}}" style="min-width:180px;" required>
+  </td>
+  <td>
+    <textarea name="answer" style="min-width:200px;min-height:60px;" required>{{.Answer}}</textarea>
+  </td>
+  <td>
+    <button class="btn-sm"
+      hx-include="closest tr"
+      hx-put="/dashboard/clinics/{{.ClinicID}}/faqs/{{.ID}}"
+      hx-target="#faq-row-{{.ID}}"
+      hx-swap="outerHTML">Save</button>
+    <button class="btn-sm outline secondary"
+      hx-get="/dashboard/clinics/{{.ClinicID}}/faqs/{{.ID}}"
+      hx-target="#faq-row-{{.ID}}"
+      hx-swap="outerHTML">Cancel</button>
+  </td>
+</tr>
+{{end}}

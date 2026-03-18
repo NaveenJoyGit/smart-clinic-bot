@@ -1,0 +1,41 @@
+{{define "content"}}
+<div class="page-header">
+  <h2>FAQs</h2>
+</div>
+
+<div class="add-form">
+  <h3>Add FAQ</h3>
+  <form hx-post="/dashboard/clinics/{{deref .ClinicID}}/faqs"
+        hx-target="#faq-table-body"
+        hx-swap="afterbegin"
+        hx-on:htmx:after-request="if(event.detail.successful) this.reset()">
+    <div class="form-row">
+      <input type="text" name="category" placeholder="Category" value="general">
+      <input type="text" name="question" placeholder="Question" required style="flex:2;">
+      <textarea name="answer" placeholder="Answer" required></textarea>
+      <button type="submit" class="btn-sm">Add</button>
+    </div>
+  </form>
+</div>
+
+<div style="overflow-x:auto;">
+  <table>
+    <thead>
+      <tr>
+        <th style="width:120px;">Category</th>
+        <th>Question</th>
+        <th>Answer</th>
+        <th style="width:120px;">Actions</th>
+      </tr>
+    </thead>
+    <tbody id="faq-table-body">
+      {{range .Data.FAQs}}
+      {{template "faq_row" .}}
+      {{end}}
+    </tbody>
+  </table>
+</div>
+{{if not .Data.FAQs}}
+<p style="color:var(--pico-muted-color);margin-top:1rem;">No FAQs yet. Add one above.</p>
+{{end}}
+{{end}}

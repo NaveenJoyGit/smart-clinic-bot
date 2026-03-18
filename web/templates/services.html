@@ -1,0 +1,44 @@
+{{define "content"}}
+<div class="page-header">
+  <h2>Services</h2>
+</div>
+
+<div class="add-form">
+  <h3>Add Service</h3>
+  <form hx-post="/dashboard/clinics/{{deref .ClinicID}}/services"
+        hx-target="#service-table-body"
+        hx-swap="afterbegin"
+        hx-on:htmx:after-request="if(event.detail.successful) this.reset()">
+    <div class="form-row">
+      <input type="text" name="name" placeholder="Service name" required>
+      <input type="text" name="category" placeholder="Category" value="general">
+      <textarea name="description" placeholder="Description (optional)"></textarea>
+      <input type="number" name="price_min" placeholder="Min price" step="0.01" min="0">
+      <input type="number" name="price_max" placeholder="Max price" step="0.01" min="0">
+      <button type="submit" class="btn-sm">Add</button>
+    </div>
+  </form>
+</div>
+
+<div style="overflow-x:auto;">
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Category</th>
+        <th>Description</th>
+        <th>Price Range</th>
+        <th style="width:120px;">Actions</th>
+      </tr>
+    </thead>
+    <tbody id="service-table-body">
+      {{range .Data.Services}}
+      {{template "service_row" .}}
+      {{end}}
+    </tbody>
+  </table>
+</div>
+{{if not .Data.Services}}
+<p style="color:var(--pico-muted-color);margin-top:1rem;">No services yet. Add one above.</p>
+{{end}}
+{{end}}

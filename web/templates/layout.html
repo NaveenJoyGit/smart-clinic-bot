@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Clinic Admin</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  <link rel="stylesheet" href="/dashboard/static/style.css">
+  <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
+</head>
+<body>
+  <nav class="top-nav">
+    <strong>&#x1F3E5; Smart Clinic Admin</strong>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <span style="font-size:0.9rem;color:var(--pico-muted-color);">{{.User.Email}}</span>
+      <form method="post" action="/dashboard/logout" style="margin:0;">
+        <button type="submit" class="btn-sm outline secondary">Logout</button>
+      </form>
+    </div>
+  </nav>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <ul>
+        <li><a href="/dashboard/">&#x1F4CA; Overview</a></li>
+      </ul>
+      {{if .User.IsSuperAdmin}}
+      <div class="nav-section">Super Admin</div>
+      <ul>
+        <li><a href="/dashboard/clinics">&#x1F3E5; Clinics</a></li>
+        <li><a href="/dashboard/users">&#x1F465; Users</a></li>
+      </ul>
+      {{end}}
+      {{with .ClinicID}}
+      <div class="nav-section">Clinic</div>
+      <ul>
+        <li><a href="/dashboard/clinics/{{.}}/faqs">&#x2753; FAQs</a></li>
+        <li><a href="/dashboard/clinics/{{.}}/services">&#x2695;&#xFE0F; Services</a></li>
+        <li><a href="/dashboard/clinics/{{.}}/doctors">&#x1F9D1;&#x200D;&#x2695;&#xFE0F; Doctors</a></li>
+        <li><a href="/dashboard/clinics/{{.}}/appointments">&#x1F4C5; Appointments</a></li>
+        <li><a href="/dashboard/clinics/{{.}}/conversations">&#x1F4AC; Conversations</a></li>
+      </ul>
+      {{end}}
+    </aside>
+
+    <main class="main-content">
+      <div id="toast-container"></div>
+      {{template "content" .}}
+    </main>
+  </div>
+</body>
+</html>

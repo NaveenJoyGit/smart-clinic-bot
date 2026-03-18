@@ -1,0 +1,47 @@
+{{define "content"}}
+<div class="page-header">
+  <h2>Clinics</h2>
+</div>
+
+<div class="add-form">
+  <h3>Add Clinic</h3>
+  <form hx-post="/dashboard/clinics"
+        hx-target="#clinic-table-body"
+        hx-swap="afterbegin"
+        hx-on:htmx:after-request="if(event.detail.successful) this.reset()">
+    <div class="form-row">
+      <input type="text" name="name" placeholder="Clinic name" required>
+      <input type="text" name="slug" placeholder="Slug (e.g. downtown-clinic)" required>
+      <input type="text" name="address" placeholder="Address">
+      <input type="text" name="city" placeholder="City">
+      <input type="tel" name="phone" placeholder="Phone">
+      <input type="email" name="email" placeholder="Email">
+      <button type="submit" class="btn-sm">Add</button>
+    </div>
+  </form>
+</div>
+
+<div style="overflow-x:auto;">
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Slug</th>
+        <th>City</th>
+        <th>Phone</th>
+        <th>Active</th>
+        <th>Created</th>
+        <th>Manage</th>
+      </tr>
+    </thead>
+    <tbody id="clinic-table-body">
+      {{range .Data.Clinics}}
+      {{template "clinic_row" .}}
+      {{end}}
+    </tbody>
+  </table>
+</div>
+{{if not .Data.Clinics}}
+<p style="color:var(--pico-muted-color);margin-top:1rem;">No clinics yet. Add one above.</p>
+{{end}}
+{{end}}

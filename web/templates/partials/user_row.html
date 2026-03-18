@@ -1,0 +1,19 @@
+{{define "user_row"}}
+<tr id="user-row-{{.ID}}">
+  <td>{{.Name}}</td>
+  <td>{{.Email}}</td>
+  <td><span class="badge badge-{{.Role}}">{{.Role}}</span></td>
+  <td style="font-family:monospace;font-size:0.75rem;">{{deref .ClinicID}}</td>
+  <td>{{if .IsActive}}&#x2705;{{else}}&#x274C;{{end}}</td>
+  <td>{{formatNullDate .LastLoginAt}}</td>
+  <td>
+    {{if .IsActive}}
+    <button class="btn-sm outline secondary"
+      hx-delete="/dashboard/users/{{.ID}}"
+      hx-target="#user-row-{{.ID}}"
+      hx-swap="outerHTML"
+      hx-confirm="Deactivate this user?">Deactivate</button>
+    {{end}}
+  </td>
+</tr>
+{{end}}

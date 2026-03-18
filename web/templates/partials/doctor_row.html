@@ -1,0 +1,20 @@
+{{define "doctor_row"}}
+<tr id="doctor-row-{{.ID}}">
+  <td>{{.Name}}</td>
+  <td>{{deref .Specialization}}</td>
+  <td>{{join .Qualifications}}</td>
+  <td>{{join .AvailableDays}}</td>
+  <td>{{join .Languages}}</td>
+  <td>
+    <button class="btn-sm outline"
+      hx-get="/dashboard/clinics/{{.ClinicID}}/doctors/{{.ID}}/edit"
+      hx-target="#doctor-row-{{.ID}}"
+      hx-swap="outerHTML">Edit</button>
+    <button class="btn-sm outline secondary"
+      hx-delete="/dashboard/clinics/{{.ClinicID}}/doctors/{{.ID}}"
+      hx-target="#doctor-row-{{.ID}}"
+      hx-swap="delete"
+      hx-confirm="Delete this doctor?">Del</button>
+  </td>
+</tr>
+{{end}}

@@ -1,0 +1,9 @@
+{{define "toast"}}
+<div id="toast-container" hx-swap-oob="true">
+  {{if .Error}}
+  <div class="flash-toast error">{{.Error}}</div>
+  {{else if .Flash}}
+  <div class="flash-toast success">{{.Flash}}</div>
+  {{end}}
+</div>
+{{end}}

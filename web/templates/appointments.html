@@ -1,0 +1,42 @@
+{{define "content"}}
+<div class="page-header">
+  <h2>Appointments</h2>
+</div>
+
+<form method="get" style="margin-bottom:1rem;display:flex;gap:0.5rem;align-items:center;">
+  <label for="status-filter" style="margin:0;white-space:nowrap;">Filter by status:</label>
+  <select id="status-filter" name="status" style="margin:0;width:auto;">
+    <option value="" {{if eq .Data.StatusFilter ""}}selected{{end}}>All</option>
+    <option value="pending" {{if eq .Data.StatusFilter "pending"}}selected{{end}}>Pending</option>
+    <option value="confirmed" {{if eq .Data.StatusFilter "confirmed"}}selected{{end}}>Confirmed</option>
+    <option value="cancelled" {{if eq .Data.StatusFilter "cancelled"}}selected{{end}}>Cancelled</option>
+    <option value="completed" {{if eq .Data.StatusFilter "completed"}}selected{{end}}>Completed</option>
+    <option value="no_show" {{if eq .Data.StatusFilter "no_show"}}selected{{end}}>No Show</option>
+  </select>
+  <button type="submit" class="btn-sm">Apply</button>
+</form>
+
+<div style="overflow-x:auto;">
+  <table>
+    <thead>
+      <tr>
+        <th>Patient</th>
+        <th>Phone</th>
+        <th>Preferred Date</th>
+        <th>Time</th>
+        <th>Status</th>
+        <th>Notes</th>
+        <th>Created</th>
+      </tr>
+    </thead>
+    <tbody id="appt-table-body">
+      {{range .Data.Appointments}}
+      {{template "appt_row" .}}
+      {{end}}
+    </tbody>
+  </table>
+</div>
+{{if not .Data.Appointments}}
+<p style="color:var(--pico-muted-color);margin-top:1rem;">No appointments found.</p>
+{{end}}
+{{end}}

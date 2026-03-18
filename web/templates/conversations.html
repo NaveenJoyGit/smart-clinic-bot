@@ -1,0 +1,35 @@
+{{define "content"}}
+<div class="page-header">
+  <h2>Conversations</h2>
+</div>
+
+<div style="overflow-x:auto;">
+  <table>
+    <thead>
+      <tr>
+        <th>Platform</th>
+        <th>Patient Name</th>
+        <th>External ID</th>
+        <th>Status</th>
+        <th>Started</th>
+        <th>Last Active</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .Data.Conversations}}
+      <tr>
+        <td>{{.Platform}}</td>
+        <td>{{deref .PatientName}}</td>
+        <td style="font-family:monospace;font-size:0.8rem;">{{.ExternalID}}</td>
+        <td><span class="badge badge-{{.Status}}">{{.Status}}</span></td>
+        <td>{{formatDate .CreatedAt}}</td>
+        <td>{{formatDate .UpdatedAt}}</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+{{if not .Data.Conversations}}
+<p style="color:var(--pico-muted-color);margin-top:1rem;">No conversations yet.</p>
+{{end}}
+{{end}}

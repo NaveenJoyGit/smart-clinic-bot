@@ -1,0 +1,25 @@
+{{define "appt_row"}}
+<tr id="appt-row-{{.ID}}">
+  <td>{{.PatientName}}</td>
+  <td>{{.PatientPhone}}</td>
+  <td>{{formatNullDate .PreferredDate}}</td>
+  <td>{{deref .PreferredTime}}</td>
+  <td>
+    <form hx-put="/dashboard/clinics/{{.ClinicID}}/appointments/{{.ID}}/status"
+          hx-target="#appt-row-{{.ID}}"
+          hx-swap="outerHTML"
+          style="display:flex;gap:0.4rem;align-items:center;margin:0;">
+      <select name="status" style="margin:0;padding:0.2rem 0.4rem;font-size:0.8rem;width:auto;">
+        <option value="pending"   {{if eq .Status "pending"}}selected{{end}}>Pending</option>
+        <option value="confirmed" {{if eq .Status "confirmed"}}selected{{end}}>Confirmed</option>
+        <option value="cancelled" {{if eq .Status "cancelled"}}selected{{end}}>Cancelled</option>
+        <option value="completed" {{if eq .Status "completed"}}selected{{end}}>Completed</option>
+        <option value="no_show"   {{if eq .Status "no_show"}}selected{{end}}>No Show</option>
+      </select>
+      <button type="submit" class="btn-sm">Save</button>
+    </form>
+  </td>
+  <td style="max-width:180px;word-break:break-word;">{{deref .Notes}}</td>
+  <td>{{formatDate .CreatedAt}}</td>
+</tr>
+{{end}}

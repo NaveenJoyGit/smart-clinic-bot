@@ -1,0 +1,22 @@
+{{define "service_row"}}
+<tr id="service-row-{{.ID}}">
+  <td>{{.Name}}</td>
+  <td>{{.Category}}</td>
+  <td>{{deref .Description}}</td>
+  <td>
+    {{if .PriceMin}}{{printf "%.2f" (derefFloat .PriceMin)}}{{end}}
+    {{if .PriceMax}}–{{printf "%.2f" (derefFloat .PriceMax)}}{{end}}
+  </td>
+  <td>
+    <button class="btn-sm outline"
+      hx-get="/dashboard/clinics/{{.ClinicID}}/services/{{.ID}}/edit"
+      hx-target="#service-row-{{.ID}}"
+      hx-swap="outerHTML">Edit</button>
+    <button class="btn-sm outline secondary"
+      hx-delete="/dashboard/clinics/{{.ClinicID}}/services/{{.ID}}"
+      hx-target="#service-row-{{.ID}}"
+      hx-swap="delete"
+      hx-confirm="Delete this service?">Del</button>
+  </td>
+</tr>
+{{end}}

@@ -1,0 +1,210 @@
+/* Smart Clinic Admin — minimal overrides for Pico CSS */
+
+body {
+  padding: 0;
+}
+
+nav.top-nav {
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid var(--pico-muted-border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.layout {
+  display: flex;
+  min-height: calc(100vh - 56px);
+}
+
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  padding: 1.5rem 1rem;
+  border-right: 1px solid var(--pico-muted-border-color);
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar ul li {
+  margin-bottom: 0.25rem;
+}
+
+.sidebar ul li a {
+  display: block;
+  padding: 0.4rem 0.75rem;
+  border-radius: 4px;
+  text-decoration: none;
+  color: var(--pico-color);
+}
+
+.sidebar ul li a:hover {
+  background: var(--pico-muted-background-color);
+}
+
+.sidebar .nav-section {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--pico-muted-color);
+  margin: 1rem 0.75rem 0.25rem;
+}
+
+.main-content {
+  flex: 1;
+  padding: 1.5rem 2rem;
+  overflow: auto;
+}
+
+#toast-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+  min-width: 280px;
+}
+
+.flash-toast {
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.flash-toast.success {
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #6ee7b7;
+}
+
+.flash-toast.error {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: var(--pico-card-background-color);
+  border: 1px solid var(--pico-muted-border-color);
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+
+.stat-card .label {
+  font-size: 0.8rem;
+  color: var(--pico-muted-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-card .value {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-top: 0.25rem;
+}
+
+table {
+  width: 100%;
+  font-size: 0.9rem;
+}
+
+.add-form {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--pico-card-background-color);
+  border: 1px solid var(--pico-muted-border-color);
+  border-radius: 8px;
+}
+
+.add-form h3 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.add-form .form-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.add-form .form-row input,
+.add-form .form-row textarea,
+.add-form .form-row select {
+  margin-bottom: 0;
+  flex: 1;
+  min-width: 140px;
+}
+
+.add-form .form-row textarea {
+  min-height: 60px;
+}
+
+.btn-sm {
+  padding: 0.3rem 0.75rem;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.2em 0.6em;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.badge-pending    { background: #fef3c7; color: #92400e; }
+.badge-confirmed  { background: #dbeafe; color: #1e40af; }
+.badge-cancelled  { background: #fee2e2; color: #991b1b; }
+.badge-completed  { background: #d1fae5; color: #065f46; }
+.badge-no_show    { background: #f3e8ff; color: #6b21a8; }
+.badge-active     { background: #dbeafe; color: #1e40af; }
+.badge-escalated  { background: #fef3c7; color: #92400e; }
+.badge-closed     { background: #f3f4f6; color: #374151; }
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.page-header h2 {
+  margin: 0;
+}
+
+.htmx-indicator {
+  display: none;
+}
+
+.htmx-request .htmx-indicator {
+  display: inline;
+}
+
+td .form-row {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+td input, td select, td textarea {
+  margin-bottom: 0;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.85rem;
+}

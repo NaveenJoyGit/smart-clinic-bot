@@ -1,0 +1,46 @@
+{{define "content"}}
+<div class="page-header">
+  <h2>Doctors</h2>
+</div>
+
+<div class="add-form">
+  <h3>Add Doctor</h3>
+  <form hx-post="/dashboard/clinics/{{deref .ClinicID}}/doctors"
+        hx-target="#doctor-table-body"
+        hx-swap="afterbegin"
+        hx-on:htmx:after-request="if(event.detail.successful) this.reset()">
+    <div class="form-row">
+      <input type="text" name="name" placeholder="Doctor name" required>
+      <input type="text" name="specialization" placeholder="Specialization">
+      <input type="text" name="qualifications" placeholder="Qualifications (comma-separated)">
+      <input type="text" name="available_days" placeholder="Available days (e.g. Mon,Wed,Fri)">
+      <input type="text" name="languages" placeholder="Languages (e.g. English,Arabic)" value="English">
+      <textarea name="bio" placeholder="Bio (optional)"></textarea>
+      <button type="submit" class="btn-sm">Add</button>
+    </div>
+  </form>
+</div>
+
+<div style="overflow-x:auto;">
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Specialization</th>
+        <th>Qualifications</th>
+        <th>Available Days</th>
+        <th>Languages</th>
+        <th style="width:120px;">Actions</th>
+      </tr>
+    </thead>
+    <tbody id="doctor-table-body">
+      {{range .Data.Doctors}}
+      {{template "doctor_row" .}}
+      {{end}}
+    </tbody>
+  </table>
+</div>
+{{if not .Data.Doctors}}
+<p style="color:var(--pico-muted-color);margin-top:1rem;">No doctors yet. Add one above.</p>
+{{end}}
+{{end}}

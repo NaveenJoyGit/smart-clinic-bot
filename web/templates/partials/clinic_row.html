@@ -1,0 +1,13 @@
+{{define "clinic_row"}}
+<tr id="clinic-row-{{.ID}}">
+  <td>{{.Name}}</td>
+  <td><code>{{.Slug}}</code></td>
+  <td>{{deref .City}}</td>
+  <td>{{deref .Phone}}</td>
+  <td>{{if .IsActive}}&#x2705;{{else}}&#x274C;{{end}}</td>
+  <td>{{formatDate .CreatedAt}}</td>
+  <td>
+    <a href="/dashboard/clinics/{{.ID}}/faqs" class="btn-sm outline">Manage</a>
+  </td>
+</tr>
+{{end}}

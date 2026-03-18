@@ -1,0 +1,20 @@
+{{define "doctor_edit_row"}}
+<tr id="doctor-row-{{.ID}}">
+  <td><input type="text" name="name" value="{{.Name}}" required style="min-width:120px;"></td>
+  <td><input type="text" name="specialization" value="{{deref .Specialization}}" style="min-width:110px;"></td>
+  <td><input type="text" name="qualifications" value="{{join .Qualifications}}" placeholder="MBBS, MD" style="min-width:110px;"></td>
+  <td><input type="text" name="available_days" value="{{join .AvailableDays}}" placeholder="Mon,Wed,Fri" style="min-width:110px;"></td>
+  <td><input type="text" name="languages" value="{{join .Languages}}" placeholder="English" style="min-width:90px;"></td>
+  <td>
+    <button class="btn-sm"
+      hx-include="closest tr"
+      hx-put="/dashboard/clinics/{{.ClinicID}}/doctors/{{.ID}}"
+      hx-target="#doctor-row-{{.ID}}"
+      hx-swap="outerHTML">Save</button>
+    <button class="btn-sm outline secondary"
+      hx-get="/dashboard/clinics/{{.ClinicID}}/doctors/{{.ID}}"
+      hx-target="#doctor-row-{{.ID}}"
+      hx-swap="outerHTML">Cancel</button>
+  </td>
+</tr>
+{{end}}

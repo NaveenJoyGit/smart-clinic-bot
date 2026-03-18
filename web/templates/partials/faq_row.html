@@ -1,0 +1,18 @@
+{{define "faq_row"}}
+<tr id="faq-row-{{.ID}}">
+  <td>{{.Category}}</td>
+  <td>{{.Question}}</td>
+  <td>{{.Answer}}</td>
+  <td>
+    <button class="btn-sm outline"
+      hx-get="/dashboard/clinics/{{.ClinicID}}/faqs/{{.ID}}/edit"
+      hx-target="#faq-row-{{.ID}}"
+      hx-swap="outerHTML">Edit</button>
+    <button class="btn-sm outline secondary"
+      hx-delete="/dashboard/clinics/{{.ClinicID}}/faqs/{{.ID}}"
+      hx-target="#faq-row-{{.ID}}"
+      hx-swap="delete"
+      hx-confirm="Delete this FAQ?">Del</button>
+  </td>
+</tr>
+{{end}}

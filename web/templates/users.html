@@ -1,0 +1,49 @@
+{{define "content"}}
+<div class="page-header">
+  <h2>Admin Users</h2>
+</div>
+
+<div class="add-form">
+  <h3>Add User</h3>
+  <form hx-post="/dashboard/users"
+        hx-target="#user-table-body"
+        hx-swap="afterbegin"
+        hx-on:htmx:after-request="if(event.detail.successful) this.reset()">
+    <div class="form-row">
+      <input type="text" name="name" placeholder="Full name" required>
+      <input type="email" name="email" placeholder="Email" required>
+      <input type="password" name="password" placeholder="Password" required>
+      <select name="role" required>
+        <option value="clinic_admin">clinic_admin</option>
+        <option value="super_admin">super_admin</option>
+      </select>
+      <input type="text" name="clinic_id" placeholder="Clinic UUID (for clinic_admin)">
+      <button type="submit" class="btn-sm">Add</button>
+    </div>
+  </form>
+</div>
+
+<div style="overflow-x:auto;">
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Clinic ID</th>
+        <th>Active</th>
+        <th>Last Login</th>
+        <th style="width:100px;">Actions</th>
+      </tr>
+    </thead>
+    <tbody id="user-table-body">
+      {{range .Data.Users}}
+      {{template "user_row" .}}
+      {{end}}
+    </tbody>
+  </table>
+</div>
+{{if not .Data.Users}}
+<p style="color:var(--pico-muted-color);margin-top:1rem;">No users yet.</p>
+{{end}}
+{{end}}

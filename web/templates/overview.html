@@ -1,0 +1,68 @@
+{{define "content"}}
+<div class="page-header">
+  <h2>Overview</h2>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="label">Total Conversations</div>
+    <div class="value">{{.Data.TotalConversations}}</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Active Conversations</div>
+    <div class="value">{{.Data.ActiveConversations}}</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Telegram</div>
+    <div class="value">{{.Data.TelegramConv}}</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">WhatsApp</div>
+    <div class="value">{{.Data.WhatsAppConv}}</div>
+  </div>
+</div>
+
+{{if .Data.StatusCounts}}
+<h3>Appointments by Status</h3>
+<div class="stat-grid" style="margin-bottom:2rem;">
+  {{range $status, $count := .Data.StatusCounts}}
+  <div class="stat-card">
+    <div class="label">{{$status}}</div>
+    <div class="value">{{$count}}</div>
+  </div>
+  {{end}}
+</div>
+{{end}}
+
+<h3>Recent Appointments</h3>
+{{if .Data.RecentAppointments}}
+<div style="overflow-x:auto;">
+  <table>
+    <thead>
+      <tr>
+        <th>Patient</th>
+        <th>Preferred Date</th>
+        <th>Time</th>
+        <th>Status</th>
+        <th>Clinic</th>
+        <th>Created</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .Data.RecentAppointments}}
+      <tr>
+        <td>{{.PatientName}}</td>
+        <td>{{formatNullDate .PreferredDate}}</td>
+        <td>{{deref .PreferredTime}}</td>
+        <td><span class="badge badge-{{.Status}}">{{.Status}}</span></td>
+        <td>{{.ClinicName}}</td>
+        <td>{{formatDate .CreatedAt}}</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+{{else}}
+<p style="color:var(--pico-muted-color);">No appointments yet.</p>
+{{end}}
+{{end}}
