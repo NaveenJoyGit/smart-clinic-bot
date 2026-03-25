@@ -18,7 +18,6 @@ import (
 	"github.com/naveenjoy/smart-clinic-bot/internal/engine"
 	"github.com/naveenjoy/smart-clinic-bot/internal/messaging"
 	"github.com/naveenjoy/smart-clinic-bot/internal/notifications"
-	"github.com/naveenjoy/smart-clinic-bot/internal/providers/telegram"
 	"github.com/naveenjoy/smart-clinic-bot/internal/providers/whatsapp"
 	"github.com/naveenjoy/smart-clinic-bot/internal/rag"
 	"github.com/redis/go-redis/v9"
@@ -48,6 +47,10 @@ func main() {
 	if err := db.RunMigrations(ctx, pool); err != nil {
 		logger.Error("migrations failed", "error", err)
 		os.Exit(1)
+	}
+
+	if err := admin.EnsureDefaultClinic(ctx, pool, cfg.TelegramToken, logger); err != nil {
+		logger.Warn("ensure default clinic failed", "error", err)
 	}
 
 	// 4. Redis
@@ -88,11 +91,10 @@ func main() {
 	}
 
 	// 7. Providers
-	tgProvider := telegram.New(cfg.TelegramToken, cfg.DefaultTenantID)
 	waProvider := whatsapp.New(cfg.WhatsAppToken, cfg.WhatsAppPhoneID, cfg.WhatsAppVerifyToken, cfg.DefaultTenantID)
 
 	// 8. Messaging handler + notifier
-	notifier := notifications.NewNotifier(logger, pool, cfg.TelegramToken, http.DefaultClient, waProvider)
+	notifier := notifications.NewNotifier(logger, pool, http.DefaultClient, waProvider)
 	eng := engine.New(pool, convManager, aiClient, retriever, notifier, logger)
 	handler := messaging.NewHandler(convManager, eng, notifier, logger)
 
@@ -107,7 +109,7 @@ func main() {
 	}
 
 	// 11. Router + HTTP server
-	router := messaging.NewRouter(handler, pool, tgProvider, waProvider, adminRouter, dashboardRouter, logger)
+	router := messaging.NewRouter(handler, pool, waProvider, adminRouter, dashboardRouter, logger)
 	srv := &http.Server{
 		Addr:         ":" + cfg.Port,
 		Handler:      router,

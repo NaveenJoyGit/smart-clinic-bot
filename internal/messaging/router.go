@@ -21,7 +21,6 @@ import (
 func NewRouter(
 	handler *Handler,
 	pool *pgxpool.Pool,
-	tgProvider providers.MessagingProvider,
 	waProvider *whatsapp.Provider,
 	adminRouter http.Handler,
 	dashboardRouter http.Handler,
@@ -38,7 +37,6 @@ func NewRouter(
 		_ = json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
 	})
 
-	r.Post("/webhook/telegram", webhookHandlerFunc(handler, tgProvider, logger))
 	r.Post("/webhook/telegram/{slug}", telegramWebhookBySlug(handler, pool, logger))
 
 	r.Get("/webhook/whatsapp", func(w http.ResponseWriter, r *http.Request) {

@@ -46,27 +46,24 @@ type Notifier struct {
 	logger    *slog.Logger
 	providers map[string]providers.MessagingProvider
 
-	telegramDefaultToken string
-	telegramClient       *http.Client
-	telegramResolver     telegramTokenResolver
+	telegramClient   *http.Client
+	telegramResolver telegramTokenResolver
 }
 
 // NewNotifier registers one or more providers by their Name().
 func NewNotifier(
 	logger *slog.Logger,
 	pool *pgxpool.Pool,
-	telegramDefaultToken string,
 	telegramClient *http.Client,
 	ps ...providers.MessagingProvider,
 ) *Notifier {
-	return NewNotifierWithTelegramResolver(logger, dbTelegramTokenResolver{pool: pool}, telegramDefaultToken, telegramClient, ps...)
+	return NewNotifierWithTelegramResolver(logger, dbTelegramTokenResolver{pool: pool}, telegramClient, ps...)
 }
 
 // NewNotifierWithTelegramResolver allows injecting a token resolver (useful for tests).
 func NewNotifierWithTelegramResolver(
 	logger *slog.Logger,
 	resolver telegramTokenResolver,
-	telegramDefaultToken string,
 	telegramClient *http.Client,
 	ps ...providers.MessagingProvider,
 ) *Notifier {
@@ -75,40 +72,38 @@ func NewNotifierWithTelegramResolver(
 		m[p.Name()] = p
 	}
 	return &Notifier{
-		logger:              logger,
-		providers:            m,
-		telegramDefaultToken: telegramDefaultToken,
-		telegramClient:       telegramClient,
-		telegramResolver:     resolver,
+		logger:           logger,
+		providers:        m,
+		telegramClient:   telegramClient,
+		telegramResolver: resolver,
 	}
 }
 
 // Send routes a message to the named platform.
 //
-// For Telegram, the bot token is chosen by tenantID (clinic UUID) when present,
-// falling back to the default token to preserve legacy single-tenant behavior.
+// For Telegram, the bot token is loaded from clinics.telegram_bot_token for tenantID (clinic UUID).
 func (n *Notifier) Send(ctx context.Context, platform, tenantID, recipientID, text string) error {
 	if platform == "telegram" {
-		token := n.telegramDefaultToken
-		if tenantID != "" && n.telegramResolver != nil {
-			if tok, ok, err := n.telegramResolver.TelegramTokenForClinic(ctx, tenantID); err != nil {
-				n.logger.ErrorContext(ctx, "telegram token lookup failed", "clinic_id", tenantID, "error", err)
-			} else if ok {
-				token = tok
-			}
+		if n.telegramResolver == nil {
+			return fmt.Errorf("telegram token resolver not configured")
 		}
-		if token == "" {
+		tok, ok, err := n.telegramResolver.TelegramTokenForClinic(ctx, tenantID)
+		if err != nil {
+			n.logger.ErrorContext(ctx, "telegram token lookup failed", "clinic_id", tenantID, "error", err)
+			return err
+		}
+		if !ok || tok == "" {
 			return fmt.Errorf("telegram token not configured for clinic_id=%s", tenantID)
 		}
-		if err := telegram.SendMessageWithToken(ctx, n.telegramClient, token, recipientID, text); err != nil {
+		if err := telegram.SendMessageWithToken(ctx, n.telegramClient, tok, recipientID, text); err != nil {
 			n.logger.ErrorContext(ctx, "send message failed", "platform", platform, "clinic_id", tenantID, "error", err)
 			return err
 		}
 		return nil
 	}
 
-	p, ok := n.providers[platform]
-	if !ok {
+	p, has := n.providers[platform]
+	if !has {
 		return fmt.Errorf("unknown platform: %s", platform)
 	}
 	if err := p.SendMessage(ctx, recipientID, text); err != nil {

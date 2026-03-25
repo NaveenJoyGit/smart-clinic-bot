@@ -41,7 +41,6 @@ func TestNotifier_Telegram_UsesClinicTokenWhenAvailable(t *testing.T) {
 	n := NewNotifierWithTelegramResolver(
 		slog.New(slog.NewTextHandler(io.Discard, nil)),
 		fakeTelegramResolver{tokens: map[string]string{"clinic-a": "TOKEN_A"}},
-		"DEFAULT_TOKEN",
 		client,
 	)
 
@@ -54,31 +53,10 @@ func TestNotifier_Telegram_UsesClinicTokenWhenAvailable(t *testing.T) {
 	}
 }
 
-func TestNotifier_Telegram_FallsBackToDefaultToken(t *testing.T) {
-	transport := &captureTransport{}
-	client := &http.Client{Transport: transport}
-
-	n := NewNotifierWithTelegramResolver(
-		slog.New(slog.NewTextHandler(io.Discard, nil)),
-		fakeTelegramResolver{tokens: map[string]string{}},
-		"DEFAULT_TOKEN",
-		client,
-	)
-
-	if err := n.Send(context.Background(), "telegram", "clinic-a", "123", "hi"); err != nil {
-		t.Fatalf("Send() error = %v", err)
-	}
-
-	if !strings.Contains(transport.lastURL, "/botDEFAULT_TOKEN/sendMessage") {
-		t.Fatalf("expected default token in URL, got %q", transport.lastURL)
-	}
-}
-
 func TestNotifier_Telegram_ErrorsWhenNoTokenConfigured(t *testing.T) {
 	n := NewNotifierWithTelegramResolver(
 		slog.New(slog.NewTextHandler(io.Discard, nil)),
 		fakeTelegramResolver{tokens: map[string]string{}},
-		"",
 		http.DefaultClient,
 	)
 
