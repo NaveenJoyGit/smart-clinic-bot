@@ -92,7 +92,7 @@ func main() {
 	waProvider := whatsapp.New(cfg.WhatsAppToken, cfg.WhatsAppPhoneID, cfg.WhatsAppVerifyToken, cfg.DefaultTenantID)
 
 	// 8. Messaging handler + notifier
-	notifier := notifications.NewNotifier(logger, tgProvider, waProvider)
+	notifier := notifications.NewNotifier(logger, pool, cfg.TelegramToken, http.DefaultClient, waProvider)
 	eng := engine.New(pool, convManager, aiClient, retriever, notifier, logger)
 	handler := messaging.NewHandler(convManager, eng, notifier, logger)
 
@@ -107,7 +107,7 @@ func main() {
 	}
 
 	// 11. Router + HTTP server
-	router := messaging.NewRouter(handler, tgProvider, waProvider, adminRouter, dashboardRouter, logger)
+	router := messaging.NewRouter(handler, pool, tgProvider, waProvider, adminRouter, dashboardRouter, logger)
 	srv := &http.Server{
 		Addr:         ":" + cfg.Port,
 		Handler:      router,

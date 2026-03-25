@@ -14,7 +14,7 @@ import (
 )
 
 type notifier interface {
-	Send(ctx context.Context, platform, recipientID, text string) error
+	Send(ctx context.Context, platform, tenantID, recipientID, text string) error
 }
 
 // Engine runs the state-machine conversation logic.
@@ -158,7 +158,7 @@ func (e *Engine) notifyReceptionist(ctx context.Context, msg *providers.Message,
 	text := fmt.Sprintf("New appointment request\nPatient: %s\nPreferred time: %s\nPlatform: %s\nContact: %s",
 		data.PatientName, data.PreferredTime, msg.Platform, msg.SenderID)
 
-	if err := e.notifier.Send(ctx, "telegram", chatID, text); err != nil {
+	if err := e.notifier.Send(ctx, "telegram", msg.TenantID, chatID, text); err != nil {
 		e.logger.WarnContext(ctx, "receptionist notification failed", "error", err)
 	}
 }

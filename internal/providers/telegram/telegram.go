@@ -38,23 +38,39 @@ type update struct {
 	} `json:"message"`
 }
 
-func (p *Provider) ReceiveMessage(body []byte, _ map[string]string) (*providers.Message, error) {
+// ParseUpdate parses a Telegram webhook update and returns (senderID, text, ok).
+// ok is false when the update does not contain a text message.
+func ParseUpdate(body []byte) (string, string, bool, error) {
 	var u update
 	if err := json.Unmarshal(body, &u); err != nil {
-		return nil, err
+		return "", "", false, err
 	}
 	if u.Message == nil || u.Message.Text == "" {
+		return "", "", false, nil
+	}
+	return fmt.Sprintf("%d", u.Message.From.ID), u.Message.Text, true, nil
+}
+
+func (p *Provider) ReceiveMessage(body []byte, _ map[string]string) (*providers.Message, error) {
+	senderID, text, ok, err := ParseUpdate(body)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
 		return nil, nil // not a text message
 	}
 	return &providers.Message{
 		Platform: p.Name(),
 		TenantID: p.tenantID,
-		SenderID: fmt.Sprintf("%d", u.Message.From.ID),
-		Text:     u.Message.Text,
+		SenderID: senderID,
+		Text:     text,
 	}, nil
 }
 
-func (p *Provider) SendMessage(ctx context.Context, recipientID, text string) error {
+func SendMessageWithToken(ctx context.Context, client *http.Client, token, recipientID, text string) error {
+	if client == nil {
+		client = &http.Client{}
+	}
 	payload, err := json.Marshal(map[string]any{
 		"chat_id": recipientID,
 		"text":    text,
@@ -63,14 +79,14 @@ func (p *Provider) SendMessage(ctx context.Context, recipientID, text string) er
 		return err
 	}
 
-	url := fmt.Sprintf("%s/bot%s/sendMessage", apiBase, p.token)
+	url := fmt.Sprintf("%s/bot%s/sendMessage", apiBase, token)
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(payload))
 	if err != nil {
 		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := p.client.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		return err
 	}
@@ -80,4 +96,8 @@ func (p *Provider) SendMessage(ctx context.Context, recipientID, text string) er
 		return fmt.Errorf("telegram API error: %s", resp.Status)
 	}
 	return nil
+}
+
+func (p *Provider) SendMessage(ctx context.Context, recipientID, text string) error {
+	return SendMessageWithToken(ctx, p.client, p.token, recipientID, text)
 }

@@ -119,6 +119,9 @@ type clinicRow struct {
 	Email     *string   `json:"email,omitempty"`
 	IsActive  bool      `json:"is_active"`
 	CreatedAt time.Time `json:"created_at"`
+
+	// Secrets are never returned. This indicates whether a token is configured.
+	HasTelegramBotToken bool `json:"has_telegram_bot_token"`
 }
 
 // ListClinics handles GET /admin/clinics (super_admin only)
@@ -128,7 +131,8 @@ func (h *Handler) ListClinics(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusForbidden, "forbidden")
 		return
 	}
-	const q = `SELECT id::text, name, slug, address, city, phone, email, is_active, created_at
+	const q = `SELECT id::text, name, slug, address, city, phone, email, is_active, created_at,
+	                  COALESCE(telegram_bot_token,'') <> ''
 	           FROM clinics ORDER BY created_at DESC`
 	rows, err := h.pool.Query(r.Context(), q)
 	if err != nil {
@@ -140,7 +144,7 @@ func (h *Handler) ListClinics(w http.ResponseWriter, r *http.Request) {
 	var list []clinicRow
 	for rows.Next() {
 		var c clinicRow
-		if err := rows.Scan(&c.ID, &c.Name, &c.Slug, &c.Address, &c.City, &c.Phone, &c.Email, &c.IsActive, &c.CreatedAt); err != nil {
+		if err := rows.Scan(&c.ID, &c.Name, &c.Slug, &c.Address, &c.City, &c.Phone, &c.Email, &c.IsActive, &c.CreatedAt, &c.HasTelegramBotToken); err != nil {
 			writeError(w, http.StatusInternalServerError, "internal error")
 			return
 		}
@@ -159,6 +163,9 @@ type createClinicRequest struct {
 	City    *string `json:"city"`
 	Phone   *string `json:"phone"`
 	Email   *string `json:"email"`
+
+	// Optional. Never returned back in responses.
+	TelegramBotToken *string `json:"telegram_bot_token"`
 }
 
 // CreateClinic handles POST /admin/clinics (super_admin only)
@@ -177,12 +184,13 @@ func (h *Handler) CreateClinic(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "name and slug are required")
 		return
 	}
-	const q = `INSERT INTO clinics (name, slug, address, city, phone, email)
-	           VALUES ($1, $2, $3, $4, $5, $6)
-	           RETURNING id::text, name, slug, address, city, phone, email, is_active, created_at`
+	const q = `INSERT INTO clinics (name, slug, address, city, phone, email, telegram_bot_token)
+	           VALUES ($1, $2, $3, $4, $5, $6, $7)
+	           RETURNING id::text, name, slug, address, city, phone, email, is_active, created_at,
+	                     COALESCE(telegram_bot_token,'') <> ''`
 	var c clinicRow
-	err := h.pool.QueryRow(r.Context(), q, req.Name, req.Slug, req.Address, req.City, req.Phone, req.Email).
-		Scan(&c.ID, &c.Name, &c.Slug, &c.Address, &c.City, &c.Phone, &c.Email, &c.IsActive, &c.CreatedAt)
+	err := h.pool.QueryRow(r.Context(), q, req.Name, req.Slug, req.Address, req.City, req.Phone, req.Email, req.TelegramBotToken).
+		Scan(&c.ID, &c.Name, &c.Slug, &c.Address, &c.City, &c.Phone, &c.Email, &c.IsActive, &c.CreatedAt, &c.HasTelegramBotToken)
 	if pgErrCode(err) == "23505" {
 		writeError(w, http.StatusConflict, "slug already exists")
 		return
@@ -202,11 +210,12 @@ func (h *Handler) GetClinic(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusForbidden, "forbidden")
 		return
 	}
-	const q = `SELECT id::text, name, slug, address, city, phone, email, is_active, created_at
+	const q = `SELECT id::text, name, slug, address, city, phone, email, is_active, created_at,
+	                  COALESCE(telegram_bot_token,'') <> ''
 	           FROM clinics WHERE id = $1::uuid`
 	var c clinicRow
 	err := h.pool.QueryRow(r.Context(), q, clinicID).
-		Scan(&c.ID, &c.Name, &c.Slug, &c.Address, &c.City, &c.Phone, &c.Email, &c.IsActive, &c.CreatedAt)
+		Scan(&c.ID, &c.Name, &c.Slug, &c.Address, &c.City, &c.Phone, &c.Email, &c.IsActive, &c.CreatedAt, &c.HasTelegramBotToken)
 	if errors.Is(err, pgx.ErrNoRows) {
 		writeError(w, http.StatusNotFound, "clinic not found")
 		return
@@ -224,6 +233,11 @@ type updateClinicRequest struct {
 	City    *string `json:"city"`
 	Phone   *string `json:"phone"`
 	Email   *string `json:"email"`
+
+	// Optional. If set:
+	// - "" clears the token
+	// - non-empty sets/rotates the token
+	TelegramBotToken *string `json:"telegram_bot_token"`
 }
 
 // UpdateClinic handles PUT /admin/clinics/{clinic_id}
@@ -242,12 +256,14 @@ func (h *Handler) UpdateClinic(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "name is required")
 		return
 	}
-	const q = `UPDATE clinics SET name=$2, address=$3, city=$4, phone=$5, email=$6
+	const q = `UPDATE clinics SET name=$2, address=$3, city=$4, phone=$5, email=$6,
+	                           telegram_bot_token = COALESCE($7, telegram_bot_token)
 	           WHERE id=$1::uuid
-	           RETURNING id::text, name, slug, address, city, phone, email, is_active, created_at`
+	           RETURNING id::text, name, slug, address, city, phone, email, is_active, created_at,
+	                     COALESCE(telegram_bot_token,'') <> ''`
 	var c clinicRow
-	err := h.pool.QueryRow(r.Context(), q, clinicID, req.Name, req.Address, req.City, req.Phone, req.Email).
-		Scan(&c.ID, &c.Name, &c.Slug, &c.Address, &c.City, &c.Phone, &c.Email, &c.IsActive, &c.CreatedAt)
+	err := h.pool.QueryRow(r.Context(), q, clinicID, req.Name, req.Address, req.City, req.Phone, req.Email, req.TelegramBotToken).
+		Scan(&c.ID, &c.Name, &c.Slug, &c.Address, &c.City, &c.Phone, &c.Email, &c.IsActive, &c.CreatedAt, &c.HasTelegramBotToken)
 	if errors.Is(err, pgx.ErrNoRows) {
 		writeError(w, http.StatusNotFound, "clinic not found")
 		return

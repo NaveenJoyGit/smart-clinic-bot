@@ -19,7 +19,7 @@ type Handler struct {
 }
 
 type notifierIface interface {
-	Send(ctx context.Context, platform, recipientID, text string) error
+	Send(ctx context.Context, platform, tenantID, recipientID, text string) error
 }
 
 // NewHandler constructs a Handler.
@@ -46,5 +46,5 @@ func (h *Handler) Handle(ctx context.Context, msg *providers.Message) error {
 	}
 
 	// 4. Send to user.
-	return h.notifier.Send(ctx, msg.Platform, msg.SenderID, reply)
+	return h.notifier.Send(ctx, msg.Platform, msg.TenantID, msg.SenderID, reply)
 }
