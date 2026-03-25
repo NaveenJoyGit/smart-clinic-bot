@@ -90,7 +90,7 @@ func Load() (*Config, error) {
 		WhatsAppVerifyToken: os.Getenv("WHATSAPP_VERIFY_TOKEN"),
 		AIProvider:           getEnv("AI_PROVIDER", "gemini"),
 		GeminiAPIKey:         os.Getenv("GEMINI_API_KEY"),
-		GeminiModel:          getEnv("GEMINI_MODEL", "gemini-1.5-flash"),
+		GeminiModel:          getEnv("GEMINI_MODEL", "gemini-2.0-flash-lite"),
 		GeminiEmbeddingModel: getEnv("GEMINI_EMBEDDING_MODEL", "text-embedding-004"),
 		OpenAIAPIKey:         os.Getenv("OPENAI_API_KEY"),
 		OpenAIBaseURL:        os.Getenv("OPENAI_BASE_URL"),

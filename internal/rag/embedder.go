@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -24,19 +25,22 @@ type GeminiEmbedder struct {
 	apiKey string
 	model  string
 	hc     *http.Client
+	logger *slog.Logger
 }
 
-func newGeminiEmbedder(_ context.Context, apiKey, model string) (*GeminiEmbedder, error) {
+func newGeminiEmbedder(_ context.Context, apiKey, model string, logger *slog.Logger) (*GeminiEmbedder, error) {
 	return &GeminiEmbedder{
 		apiKey: apiKey,
 		model:  model,
 		hc:     &http.Client{Timeout: 30 * time.Second},
+		logger: logger,
 	}, nil
 }
 
 func (e *GeminiEmbedder) Close() {}
 
 func (e *GeminiEmbedder) Embed(ctx context.Context, text string) ([]float32, error) {
+	e.logger.DebugContext(ctx, "embedding text", "model", e.model, "text_len", len(text))
 	url := fmt.Sprintf(
 		"https://generativelanguage.googleapis.com/v1beta/models/%s:embedContent?key=%s",
 		e.model, e.apiKey,
@@ -54,12 +58,14 @@ func (e *GeminiEmbedder) Embed(ctx context.Context, text string) ([]float32, err
 
 	resp, err := e.hc.Do(req)
 	if err != nil {
+		e.logger.WarnContext(ctx, "embed http request failed", "model", e.model, "error", err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	body, _ := io.ReadAll(resp.Body)
 	if resp.StatusCode != http.StatusOK {
+		e.logger.WarnContext(ctx, "embed api error", "model", e.model, "status", resp.StatusCode, "body", string(body))
 		return nil, fmt.Errorf("gemini embed: status %d: %s", resp.StatusCode, body)
 	}
 

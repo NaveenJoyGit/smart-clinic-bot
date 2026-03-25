@@ -41,6 +41,14 @@ func (e *Engine) Process(ctx context.Context, msg *providers.Message) (string, e
 		return "", err
 	}
 
+	e.logger.DebugContext(ctx, "process message",
+		"tenant_id", msg.TenantID,
+		"platform", msg.Platform,
+		"sender_id", msg.SenderID,
+		"state", data.State,
+		"text_len", len(msg.Text),
+	)
+
 	switch data.State {
 	case conversation.StateAskTime:
 		return e.handleAskTime(ctx, msg, data)
@@ -57,6 +65,7 @@ func (e *Engine) handleGeneral(ctx context.Context, msg *providers.Message, data
 		e.logger.WarnContext(ctx, "intent classification failed, defaulting to faq", "error", err)
 		intent = "faq"
 	}
+	e.logger.DebugContext(ctx, "intent classified", "intent", intent, "tenant_id", msg.TenantID)
 
 	if strings.TrimSpace(intent) == "book_appointment" {
 		data.State = conversation.StateBookingIntent
@@ -67,7 +76,11 @@ func (e *Engine) handleGeneral(ctx context.Context, msg *providers.Message, data
 	}
 
 	// FAQ: RAG + LLM
-	docs, _ := e.retriever.Search(ctx, msg.TenantID, msg.Text, 3)
+	docs, ragErr := e.retriever.Search(ctx, msg.TenantID, msg.Text, 3)
+	if ragErr != nil {
+		e.logger.WarnContext(ctx, "rag search failed, proceeding without context", "error", ragErr, "tenant_id", msg.TenantID)
+	}
+	e.logger.DebugContext(ctx, "rag search result", "docs_count", len(docs), "tenant_id", msg.TenantID)
 	history, err := e.conv.GetHistory(ctx, msg.TenantID, msg.Platform, msg.SenderID)
 	if err != nil {
 		return "", err
@@ -82,6 +95,7 @@ func (e *Engine) handleGeneral(ctx context.Context, msg *providers.Message, data
 }
 
 func (e *Engine) handleBookingIntent(ctx context.Context, msg *providers.Message, data conversation.ConvData) (string, error) {
+	e.logger.InfoContext(ctx, "state transition: booking_intent → ask_time", "tenant_id", msg.TenantID, "sender_id", msg.SenderID)
 	data.PatientName = strings.TrimSpace(msg.Text)
 	data.State = conversation.StateAskTime
 	if err := e.conv.SetConvData(ctx, msg.TenantID, msg.Platform, msg.SenderID, data); err != nil {
@@ -91,6 +105,12 @@ func (e *Engine) handleBookingIntent(ctx context.Context, msg *providers.Message
 }
 
 func (e *Engine) handleAskTime(ctx context.Context, msg *providers.Message, data conversation.ConvData) (string, error) {
+	e.logger.InfoContext(ctx, "state transition: ask_time → create_appointment",
+		"tenant_id", msg.TenantID,
+		"sender_id", msg.SenderID,
+		"patient_name", data.PatientName,
+		"preferred_time", strings.TrimSpace(msg.Text),
+	)
 	data.PreferredTime = strings.TrimSpace(msg.Text)
 
 	if err := e.createAppointment(ctx, msg, data); err != nil {
@@ -123,7 +143,11 @@ Reply with ONLY one of those two values and nothing else.`},
 		{Role: "user", Content: text},
 	}
 	result, err := e.ai.GenerateResponse(ctx, msgs)
-	return strings.ToLower(strings.TrimSpace(result)), err
+	if err != nil {
+		return "", err
+	}
+	e.logger.DebugContext(ctx, "intent classification raw result", "result", strings.TrimSpace(result))
+	return strings.ToLower(strings.TrimSpace(result)), nil
 }
 
 func (e *Engine) createAppointment(ctx context.Context, msg *providers.Message, data conversation.ConvData) error {

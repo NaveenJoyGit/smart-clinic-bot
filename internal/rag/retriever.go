@@ -2,6 +2,7 @@ package rag
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	pgvector "github.com/pgvector/pgvector-go"
@@ -19,17 +20,20 @@ type Document struct {
 type Retriever struct {
 	pool     *pgxpool.Pool
 	embedder Embedder
+	logger   *slog.Logger
 }
 
 // NewRetriever constructs a Retriever.
-func NewRetriever(pool *pgxpool.Pool, embedder Embedder) *Retriever {
-	return &Retriever{pool: pool, embedder: embedder}
+func NewRetriever(pool *pgxpool.Pool, embedder Embedder, logger *slog.Logger) *Retriever {
+	return &Retriever{pool: pool, embedder: embedder, logger: logger}
 }
 
 // Search returns the topK most similar knowledge chunks for the given clinic.
 func (r *Retriever) Search(ctx context.Context, clinicID, query string, topK int) ([]Document, error) {
+	r.logger.DebugContext(ctx, "rag search", "clinic_id", clinicID, "top_k", topK)
 	embedding, err := r.embedder.Embed(ctx, query)
 	if err != nil {
+		r.logger.WarnContext(ctx, "rag embed failed", "clinic_id", clinicID, "error", err)
 		return nil, err
 	}
 
@@ -55,5 +59,9 @@ LIMIT $3`
 		}
 		docs = append(docs, d)
 	}
-	return docs, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	r.logger.DebugContext(ctx, "rag search complete", "clinic_id", clinicID, "docs_found", len(docs))
+	return docs, nil
 }

@@ -25,7 +25,7 @@ import (
 
 func main() {
 	// 1. Logger
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
 
 	// 2. Config
 	cfg, err := config.Load()
@@ -33,6 +33,12 @@ func main() {
 		logger.Error("config load failed", "error", err)
 		os.Exit(1)
 	}
+
+	logger.Info("config loaded",
+		"ai_provider", cfg.AIProvider,
+		"gemini_model", cfg.GeminiModel,
+		"gemini_embedding_model", cfg.GeminiEmbeddingModel,
+	)
 
 	ctx := context.Background()
 
@@ -69,14 +75,14 @@ func main() {
 	}
 	defer closeAI()
 
-	embedder, closeEmb, err := rag.NewEmbedder(ctx, cfg)
+	embedder, closeEmb, err := rag.NewEmbedder(ctx, cfg, logger)
 	if err != nil {
 		logger.Error("embedder init failed", "error", err)
 		os.Exit(1)
 	}
 	defer closeEmb()
 
-	retriever := rag.NewRetriever(pool, embedder)
+	retriever := rag.NewRetriever(pool, embedder, logger)
 	indexer := rag.NewIndexer(pool, embedder)
 	convManager := conversation.NewManager(pool, rdb)
 
