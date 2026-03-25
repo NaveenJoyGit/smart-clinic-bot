@@ -3,6 +3,7 @@ package ai
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/google/generative-ai-go/genai"
 	"google.golang.org/api/option"
@@ -28,6 +29,7 @@ func (p *GeminiProvider) Close() { p.client.Close() }
 
 // GenerateResponse sends messages and returns the assistant reply.
 func (p *GeminiProvider) GenerateResponse(ctx context.Context, messages []Message) (string, error) {
+	slog.DebugContext(ctx, "gemini generate", "model", p.model, "messages", len(messages))
 	m := p.client.GenerativeModel(p.model)
 
 	// Collect system messages into SystemInstruction.
