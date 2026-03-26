@@ -66,7 +66,7 @@ func (e *GeminiEmbedder) Embed(ctx context.Context, text string) ([]float32, err
 	body, _ := io.ReadAll(resp.Body)
 	if resp.StatusCode != http.StatusOK {
 		e.logger.WarnContext(ctx, "embed api error", "model", e.model, "status", resp.StatusCode, "body", string(body))
-		return nil, fmt.Errorf("gemini embed: status %d: %s", resp.StatusCode, body)
+		return nil, fmt.Errorf("gemini embedContent (model=%s, status=%d): %s", e.model, resp.StatusCode, body)
 	}
 
 	var result struct {

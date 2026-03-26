@@ -26,6 +26,7 @@ import (
 func main() {
 	// 1. Logger
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
+	slog.SetDefault(logger)
 
 	// 2. Config
 	cfg, err := config.Load()

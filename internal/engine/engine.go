@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"strings"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/naveenjoy/smart-clinic-bot/internal/ai"
@@ -60,12 +61,24 @@ func (e *Engine) Process(ctx context.Context, msg *providers.Message) (string, e
 }
 
 func (e *Engine) handleGeneral(ctx context.Context, msg *providers.Message, data conversation.ConvData) (string, error) {
+	intentStart := time.Now()
 	intent, err := e.classifyIntent(ctx, msg.Text)
 	if err != nil {
-		e.logger.WarnContext(ctx, "intent classification failed, defaulting to faq", "error", err)
+		e.logger.WarnContext(ctx, "intent classification failed, defaulting to faq",
+			"tenant_id", msg.TenantID,
+			"platform", msg.Platform,
+			"sender_id", msg.SenderID,
+			"error", err,
+		)
 		intent = "faq"
 	}
-	e.logger.DebugContext(ctx, "intent classified", "intent", intent, "tenant_id", msg.TenantID)
+	e.logger.DebugContext(ctx, "intent classified",
+		"intent", intent,
+		"tenant_id", msg.TenantID,
+		"platform", msg.Platform,
+		"sender_id", msg.SenderID,
+		"elapsed_ms", time.Since(intentStart).Milliseconds(),
+	)
 
 	if strings.TrimSpace(intent) == "book_appointment" {
 		data.State = conversation.StateBookingIntent
@@ -76,19 +89,50 @@ func (e *Engine) handleGeneral(ctx context.Context, msg *providers.Message, data
 	}
 
 	// FAQ: RAG + LLM
+	ragStart := time.Now()
 	docs, ragErr := e.retriever.Search(ctx, msg.TenantID, msg.Text, 3)
 	if ragErr != nil {
-		e.logger.WarnContext(ctx, "rag search failed, proceeding without context", "error", ragErr, "tenant_id", msg.TenantID)
+		e.logger.WarnContext(ctx, "rag search failed, proceeding without context",
+			"tenant_id", msg.TenantID,
+			"platform", msg.Platform,
+			"error", ragErr,
+		)
 	}
-	e.logger.DebugContext(ctx, "rag search result", "docs_count", len(docs), "tenant_id", msg.TenantID)
+	e.logger.DebugContext(ctx, "rag search result",
+		"docs_count", len(docs),
+		"tenant_id", msg.TenantID,
+		"platform", msg.Platform,
+		"elapsed_ms", time.Since(ragStart).Milliseconds(),
+	)
 	history, err := e.conv.GetHistory(ctx, msg.TenantID, msg.Platform, msg.SenderID)
 	if err != nil {
 		return "", err
 	}
+	e.logger.DebugContext(ctx, "loaded history",
+		"tenant_id", msg.TenantID,
+		"platform", msg.Platform,
+		"sender_id", msg.SenderID,
+		"messages", len(history),
+	)
+	llmStart := time.Now()
 	reply, err := e.ai.GenerateResponse(ctx, buildFAQMessages(history, docs, msg.Text))
 	if err != nil {
+		e.logger.ErrorContext(ctx, "llm generate response failed",
+			"tenant_id", msg.TenantID,
+			"platform", msg.Platform,
+			"sender_id", msg.SenderID,
+			"elapsed_ms", time.Since(llmStart).Milliseconds(),
+			"error", err,
+		)
 		return "", err
 	}
+	e.logger.DebugContext(ctx, "llm generate response completed",
+		"tenant_id", msg.TenantID,
+		"platform", msg.Platform,
+		"sender_id", msg.SenderID,
+		"elapsed_ms", time.Since(llmStart).Milliseconds(),
+		"reply_len", len(reply),
+	)
 	data.State = conversation.StateAnsweringFAQ
 	_ = e.conv.SetConvData(ctx, msg.TenantID, msg.Platform, msg.SenderID, data)
 	return reply, nil
@@ -133,6 +177,7 @@ func (e *Engine) handleAskTime(ctx context.Context, msg *providers.Message, data
 }
 
 func (e *Engine) classifyIntent(ctx context.Context, text string) (string, error) {
+	start := time.Now()
 	msgs := []ai.Message{
 		{Role: "system", Content: `You are an intent classifier for a clinic chatbot.
 Classify the user's message as exactly one of:
@@ -146,7 +191,10 @@ Reply with ONLY one of those two values and nothing else.`},
 	if err != nil {
 		return "", err
 	}
-	e.logger.DebugContext(ctx, "intent classification raw result", "result", strings.TrimSpace(result))
+	e.logger.DebugContext(ctx, "intent classification raw result",
+		"result", strings.TrimSpace(result),
+		"elapsed_ms", time.Since(start).Milliseconds(),
+	)
 	return strings.ToLower(strings.TrimSpace(result)), nil
 }
 

@@ -68,7 +68,7 @@ func (p *GeminiProvider) GenerateResponse(ctx context.Context, messages []Messag
 
 	resp, err := cs.SendMessage(ctx, genai.Text(chat[len(chat)-1].Content))
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("gemini generateContent (model=%s): %w", p.model, err)
 	}
 	if len(resp.Candidates) == 0 || len(resp.Candidates[0].Content.Parts) == 0 {
 		return "", fmt.Errorf("no response from Gemini")
