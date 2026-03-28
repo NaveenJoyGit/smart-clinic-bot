@@ -1,8 +1,10 @@
 package dashboard
 
 import (
+	"io/fs"
 	"log/slog"
 	"net/http"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -20,12 +22,9 @@ func NewRouter(pool *pgxpool.Pool, indexer *rag.Indexer, jwtSecret string, logge
 
 	r := chi.NewRouter()
 
-	// Static assets (no auth). Chi strips "/dashboard" prefix before forwarding,
-	// so path here is e.g. "/static/style.css" → serves static/style.css from web.FS.
-	staticServer := http.FileServer(http.FS(web.FS))
-	r.Get("/static/*", func(w http.ResponseWriter, req *http.Request) {
-		staticServer.ServeHTTP(w, req)
-	})
+	// Static assets (no auth).
+	staticFS, _ := fs.Sub(web.FS, "static")
+	fileServer(r, "/static", http.FS(staticFS))
 
 	// Public routes (no auth)
 	r.Get("/login", h.GetLogin)
@@ -74,4 +73,21 @@ func NewRouter(pool *pgxpool.Pool, indexer *rag.Indexer, jwtSecret string, logge
 	})
 
 	return r, nil
+}
+
+// fileServer sets up a http.FileServer handler to serve static files from root.
+// Adapted from the official go-chi/chi FileServer example.
+func fileServer(r chi.Router, path string, root http.FileSystem) {
+	if path != "/" && path[len(path)-1] != '/' {
+		r.Get(path, http.RedirectHandler(path+"/", http.StatusMovedPermanently).ServeHTTP)
+		path += "/"
+	}
+	path += "*"
+
+	r.Get(path, func(w http.ResponseWriter, r *http.Request) {
+		rctx := chi.RouteContext(r.Context())
+		pathPrefix := strings.TrimSuffix(rctx.RoutePattern(), "/*")
+		fs := http.StripPrefix(pathPrefix, http.FileServer(root))
+		fs.ServeHTTP(w, r)
+	})
 }

@@ -15,12 +15,14 @@
       <textarea name="description" placeholder="Description (optional)"></textarea>
       <input type="number" name="price_min" placeholder="Min price" step="0.01" min="0">
       <input type="number" name="price_max" placeholder="Max price" step="0.01" min="0">
-      <button type="submit" class="btn-sm">Add</button>
+    </div>
+    <div style="margin-top:0.75rem;">
+      <button type="submit" class="btn-sm">Add Service</button>
     </div>
   </form>
 </div>
 
-<div style="overflow-x:auto;">
+<div class="table-wrap">
   <table>
     <thead>
       <tr>
@@ -39,6 +41,6 @@
   </table>
 </div>
 {{if not .Data.Services}}
-<p style="color:var(--pico-muted-color);margin-top:1rem;">No services yet. Add one above.</p>
+<div class="empty-state">No services yet. Add one above.</div>
 {{end}}
 {{end}}

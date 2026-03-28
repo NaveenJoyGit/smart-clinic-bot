@@ -23,8 +23,8 @@
 </div>
 
 {{if .Data.StatusCounts}}
-<h3>Appointments by Status</h3>
-<div class="stat-grid" style="margin-bottom:2rem;">
+<h3 class="section-heading">Appointments by Status</h3>
+<div class="stat-grid">
   {{range $status, $count := .Data.StatusCounts}}
   <div class="stat-card">
     <div class="label">{{$status}}</div>
@@ -34,9 +34,9 @@
 </div>
 {{end}}
 
-<h3>Recent Appointments</h3>
+<h3 class="section-heading">Recent Appointments</h3>
 {{if .Data.RecentAppointments}}
-<div style="overflow-x:auto;">
+<div class="table-wrap">
   <table>
     <thead>
       <tr>
@@ -63,6 +63,6 @@
   </table>
 </div>
 {{else}}
-<p style="color:var(--pico-muted-color);">No appointments yet.</p>
+<div class="empty-state">No appointments yet.</div>
 {{end}}
 {{end}}

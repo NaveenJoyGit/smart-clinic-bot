@@ -1,20 +1,25 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Smart Clinic Admin</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/dashboard/static/style.css">
   <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
 </head>
 <body>
   <nav class="top-nav">
-    <strong>&#x1F3E5; Smart Clinic Admin</strong>
-    <div style="display:flex;align-items:center;gap:1rem;">
-      <span style="font-size:0.9rem;color:var(--pico-muted-color);">{{.User.Email}}</span>
+    <div class="brand">
+      <div class="brand-icon">&#x2695;&#xFE0F;</div>
+      <span>Smart Clinic</span>
+    </div>
+    <div class="user-area">
+      <span class="user-email">{{.User.Email}}</span>
       <form method="post" action="/dashboard/logout" style="margin:0;">
-        <button type="submit" class="btn-sm outline secondary">Logout</button>
+        <button type="submit" class="btn-logout">Logout</button>
       </form>
     </div>
   </nav>
@@ -22,23 +27,23 @@
   <div class="layout">
     <aside class="sidebar">
       <ul>
-        <li><a href="/dashboard/">&#x1F4CA; Overview</a></li>
+        <li><a href="/dashboard/"><span class="nav-icon">&#x1F4CA;</span> <span>Overview</span></a></li>
       </ul>
       {{if .User.IsSuperAdmin}}
       <div class="nav-section">Super Admin</div>
       <ul>
-        <li><a href="/dashboard/clinics">&#x1F3E5; Clinics</a></li>
-        <li><a href="/dashboard/users">&#x1F465; Users</a></li>
+        <li><a href="/dashboard/clinics"><span class="nav-icon">&#x1F3E5;</span> <span>Clinics</span></a></li>
+        <li><a href="/dashboard/users"><span class="nav-icon">&#x1F465;</span> <span>Users</span></a></li>
       </ul>
       {{end}}
       {{with .ClinicID}}
       <div class="nav-section">Clinic</div>
       <ul>
-        <li><a href="/dashboard/clinics/{{.}}/faqs">&#x2753; FAQs</a></li>
-        <li><a href="/dashboard/clinics/{{.}}/services">&#x2695;&#xFE0F; Services</a></li>
-        <li><a href="/dashboard/clinics/{{.}}/doctors">&#x1F9D1;&#x200D;&#x2695;&#xFE0F; Doctors</a></li>
-        <li><a href="/dashboard/clinics/{{.}}/appointments">&#x1F4C5; Appointments</a></li>
-        <li><a href="/dashboard/clinics/{{.}}/conversations">&#x1F4AC; Conversations</a></li>
+        <li><a href="/dashboard/clinics/{{.}}/faqs"><span class="nav-icon">&#x2753;</span> <span>FAQs</span></a></li>
+        <li><a href="/dashboard/clinics/{{.}}/services"><span class="nav-icon">&#x2695;&#xFE0F;</span> <span>Services</span></a></li>
+        <li><a href="/dashboard/clinics/{{.}}/doctors"><span class="nav-icon">&#x1F9D1;&#x200D;&#x2695;&#xFE0F;</span> <span>Doctors</span></a></li>
+        <li><a href="/dashboard/clinics/{{.}}/appointments"><span class="nav-icon">&#x1F4C5;</span> <span>Appointments</span></a></li>
+        <li><a href="/dashboard/clinics/{{.}}/conversations"><span class="nav-icon">&#x1F4AC;</span> <span>Conversations</span></a></li>
       </ul>
       {{end}}
     </aside>
@@ -48,5 +53,18 @@
       {{template "content" .}}
     </main>
   </div>
+
+  <!-- Highlight active sidebar link based on current path -->
+  <script>
+    (function(){
+      var path = window.location.pathname.replace(/\/+$/, '');
+      document.querySelectorAll('.sidebar a').forEach(function(a){
+        var href = a.getAttribute('href').replace(/\/+$/, '');
+        if(path === href || (href !== '/dashboard' && path.startsWith(href))){
+          a.classList.add('active');
+        }
+      });
+    })();
+  </script>
 </body>
 </html>

@@ -3,8 +3,8 @@
   <td>{{.Name}}</td>
   <td>{{.Email}}</td>
   <td><span class="badge badge-{{.Role}}">{{.Role}}</span></td>
-  <td style="font-family:monospace;font-size:0.75rem;">{{deref .ClinicID}}</td>
-  <td>{{if .IsActive}}&#x2705;{{else}}&#x274C;{{end}}</td>
+  <td class="mono">{{deref .ClinicID}}</td>
+  <td>{{if .IsActive}}<span class="status-dot active"></span>{{else}}<span class="status-dot inactive"></span>{{end}}</td>
   <td>{{formatNullDate .LastLoginAt}}</td>
   <td>
     {{if .IsActive}}

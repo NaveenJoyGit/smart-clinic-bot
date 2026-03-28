@@ -16,12 +16,14 @@
       <input type="text" name="city" placeholder="City">
       <input type="tel" name="phone" placeholder="Phone">
       <input type="email" name="email" placeholder="Email">
-      <button type="submit" class="btn-sm">Add</button>
+    </div>
+    <div style="margin-top:0.75rem;">
+      <button type="submit" class="btn-sm">Add Clinic</button>
     </div>
   </form>
 </div>
 
-<div style="overflow-x:auto;">
+<div class="table-wrap">
   <table>
     <thead>
       <tr>
@@ -42,6 +44,6 @@
   </table>
 </div>
 {{if not .Data.Clinics}}
-<p style="color:var(--pico-muted-color);margin-top:1rem;">No clinics yet. Add one above.</p>
+<div class="empty-state">No clinics yet. Add one above.</div>
 {{end}}
 {{end}}

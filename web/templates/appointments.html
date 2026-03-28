@@ -3,9 +3,9 @@
   <h2>Appointments</h2>
 </div>
 
-<form method="get" style="margin-bottom:1rem;display:flex;gap:0.5rem;align-items:center;">
-  <label for="status-filter" style="margin:0;white-space:nowrap;">Filter by status:</label>
-  <select id="status-filter" name="status" style="margin:0;width:auto;">
+<form method="get" class="filter-bar">
+  <label for="status-filter">Filter by status:</label>
+  <select id="status-filter" name="status">
     <option value="" {{if eq .Data.StatusFilter ""}}selected{{end}}>All</option>
     <option value="pending" {{if eq .Data.StatusFilter "pending"}}selected{{end}}>Pending</option>
     <option value="confirmed" {{if eq .Data.StatusFilter "confirmed"}}selected{{end}}>Confirmed</option>
@@ -16,7 +16,7 @@
   <button type="submit" class="btn-sm">Apply</button>
 </form>
 
-<div style="overflow-x:auto;">
+<div class="table-wrap">
   <table>
     <thead>
       <tr>
@@ -37,6 +37,6 @@
   </table>
 </div>
 {{if not .Data.Appointments}}
-<p style="color:var(--pico-muted-color);margin-top:1rem;">No appointments found.</p>
+<div class="empty-state">No appointments found.</div>
 {{end}}
 {{end}}

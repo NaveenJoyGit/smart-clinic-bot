@@ -4,7 +4,7 @@
   <td><code>{{.Slug}}</code></td>
   <td>{{deref .City}}</td>
   <td>{{deref .Phone}}</td>
-  <td>{{if .IsActive}}&#x2705;{{else}}&#x274C;{{end}}</td>
+  <td>{{if .IsActive}}<span class="status-dot active"></span>{{else}}<span class="status-dot inactive"></span>{{end}}</td>
   <td>{{formatDate .CreatedAt}}</td>
   <td>
     <a href="/dashboard/clinics/{{.ID}}/faqs" class="btn-sm outline">Manage</a>

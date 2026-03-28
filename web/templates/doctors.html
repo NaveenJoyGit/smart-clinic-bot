@@ -16,12 +16,14 @@
       <input type="text" name="available_days" placeholder="Available days (e.g. Mon,Wed,Fri)">
       <input type="text" name="languages" placeholder="Languages (e.g. English,Arabic)" value="English">
       <textarea name="bio" placeholder="Bio (optional)"></textarea>
-      <button type="submit" class="btn-sm">Add</button>
+    </div>
+    <div style="margin-top:0.75rem;">
+      <button type="submit" class="btn-sm">Add Doctor</button>
     </div>
   </form>
 </div>
 
-<div style="overflow-x:auto;">
+<div class="table-wrap">
   <table>
     <thead>
       <tr>
@@ -41,6 +43,6 @@
   </table>
 </div>
 {{if not .Data.Doctors}}
-<p style="color:var(--pico-muted-color);margin-top:1rem;">No doctors yet. Add one above.</p>
+<div class="empty-state">No doctors yet. Add one above.</div>
 {{end}}
 {{end}}

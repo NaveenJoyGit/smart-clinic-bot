@@ -11,14 +11,16 @@
         hx-on:htmx:after-request="if(event.detail.successful) this.reset()">
     <div class="form-row">
       <input type="text" name="category" placeholder="Category" value="general">
-      <input type="text" name="question" placeholder="Question" required style="flex:2;">
+      <input type="text" name="question" placeholder="Question" required>
       <textarea name="answer" placeholder="Answer" required></textarea>
-      <button type="submit" class="btn-sm">Add</button>
+    </div>
+    <div style="margin-top:0.75rem;">
+      <button type="submit" class="btn-sm">Add FAQ</button>
     </div>
   </form>
 </div>
 
-<div style="overflow-x:auto;">
+<div class="table-wrap">
   <table>
     <thead>
       <tr>
@@ -36,6 +38,6 @@
   </table>
 </div>
 {{if not .Data.FAQs}}
-<p style="color:var(--pico-muted-color);margin-top:1rem;">No FAQs yet. Add one above.</p>
+<div class="empty-state">No FAQs yet. Add one above.</div>
 {{end}}
 {{end}}

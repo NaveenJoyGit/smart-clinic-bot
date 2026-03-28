@@ -18,12 +18,14 @@
         <option value="super_admin">super_admin</option>
       </select>
       <input type="text" name="clinic_id" placeholder="Clinic UUID (for clinic_admin)">
-      <button type="submit" class="btn-sm">Add</button>
+    </div>
+    <div style="margin-top:0.75rem;">
+      <button type="submit" class="btn-sm">Add User</button>
     </div>
   </form>
 </div>
 
-<div style="overflow-x:auto;">
+<div class="table-wrap">
   <table>
     <thead>
       <tr>
@@ -44,6 +46,6 @@
   </table>
 </div>
 {{if not .Data.Users}}
-<p style="color:var(--pico-muted-color);margin-top:1rem;">No users yet.</p>
+<div class="empty-state">No users yet.</div>
 {{end}}
 {{end}}

@@ -1,199 +1,476 @@
-/* Smart Clinic Admin — minimal overrides for Pico CSS */
+/* ============================================================
+   Smart Clinic Admin — Dark Theme Design System
+   ============================================================ */
 
-body {
-  padding: 0;
+/* ----------------------------------------------------------
+   CSS Custom Properties
+   ---------------------------------------------------------- */
+:root {
+  --bg-page:       #d9e4d1;
+  --bg-sidebar:    #111118;
+  --bg-topnav:     #111118;
+  --bg-card:       #1a1a26;
+  --bg-card-hover: #22222f;
+  --bg-input:      #12121c;
+  --bg-table-head: #151520;
+  --bg-table-row:  #1a1a26;
+  --bg-table-alt:  #1e1e2a;
+
+  --text-primary:  #f0f0f5;
+  --text-secondary:#a0a0b0;
+  --text-muted:    #6b6b7b;
+  --text-on-green: #052e16;
+  --text-on-orange:#431407;
+
+  --accent-green:  #4ade80;
+  --accent-orange: #fb923c;
+  --accent-red:    #f87171;
+  --accent-blue:   #60a5fa;
+  --accent-purple: #c084fc;
+
+  --border-subtle: #2a2a3a;
+  --border-input:  #333345;
+
+  --radius-sm:     8px;
+  --radius-md:     12px;
+  --radius-lg:     16px;
+  --radius-pill:   9999px;
+
+  --shadow-card:   0 2px 8px rgba(0,0,0,0.25);
+  --shadow-lg:     0 8px 32px rgba(0,0,0,0.4);
+
+  --transition:    0.2s ease;
+  --font-sans:     'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono:     'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
 }
 
+/* ----------------------------------------------------------
+   Base Reset & Typography
+   ---------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: var(--bg-page);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 0.75rem 0;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text-primary);
+}
+
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.15rem; }
+
+a {
+  color: var(--accent-green);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+a:hover {
+  color: #86efac;
+}
+
+p {
+  margin: 0 0 1rem 0;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  background: rgba(74, 222, 128, 0.1);
+  color: var(--accent-green);
+  padding: 0.15em 0.45em;
+  border-radius: 4px;
+}
+
+/* ----------------------------------------------------------
+   Top Navigation Bar
+   ---------------------------------------------------------- */
 nav.top-nav {
-  padding: 0.75rem 1.5rem;
-  border-bottom: 1px solid var(--pico-muted-border-color);
+  height: 56px;
+  padding: 0 1.5rem;
+  background: var(--bg-topnav);
+  border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
+nav.top-nav .brand {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: -0.01em;
+}
+
+nav.top-nav .brand .brand-icon {
+  width: 28px;
+  height: 28px;
+  background: var(--accent-green);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+nav.top-nav .user-area {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+nav.top-nav .user-email {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-subtle);
+}
+
+/* ----------------------------------------------------------
+   Main Layout — Sidebar + Content
+   ---------------------------------------------------------- */
 .layout {
   display: flex;
   min-height: calc(100vh - 56px);
 }
 
+/* ----------------------------------------------------------
+   Sidebar
+   ---------------------------------------------------------- */
 .sidebar {
-  width: 220px;
+  width: 230px;
   flex-shrink: 0;
-  padding: 1.5rem 1rem;
-  border-right: 1px solid var(--pico-muted-border-color);
+  padding: 1.25rem 0.75rem;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border-subtle);
+  overflow-y: auto;
 }
 
 .sidebar ul {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 0 0 0.25rem 0;
 }
 
 .sidebar ul li {
-  margin-bottom: 0.25rem;
+  margin-bottom: 2px;
 }
 
 .sidebar ul li a {
-  display: block;
-  padding: 0.4rem 0.75rem;
-  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all var(--transition);
   text-decoration: none;
-  color: var(--pico-color);
+}
+
+.sidebar ul li a .nav-icon {
+  font-size: 1.05rem;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
 }
 
 .sidebar ul li a:hover {
-  background: var(--pico-muted-background-color);
+  background: rgba(74, 222, 128, 0.08);
+  color: var(--text-primary);
+}
+
+.sidebar ul li a.active {
+  background: rgba(74, 222, 128, 0.12);
+  color: var(--accent-green);
 }
 
 .sidebar .nav-section {
-  font-size: 0.7rem;
-  font-weight: 600;
+  font-size: 0.65rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--pico-muted-color);
-  margin: 1rem 0.75rem 0.25rem;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin: 1.25rem 0.85rem 0.4rem;
 }
 
+/* ----------------------------------------------------------
+   Main Content Area
+   ---------------------------------------------------------- */
 .main-content {
   flex: 1;
-  padding: 1.5rem 2rem;
+  padding: 2rem 2.5rem;
   overflow: auto;
+  background: var(--bg-page);
 }
 
-#toast-container {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  z-index: 1000;
-  min-width: 280px;
+/* ----------------------------------------------------------
+   Page Header
+   ---------------------------------------------------------- */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
 }
 
-.flash-toast {
-  padding: 0.75rem 1rem;
-  border-radius: 6px;
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
+.page-header h2 {
+  margin: 0;
+  color: var(--bg-sidebar);
+  font-size: 1.5rem;
 }
 
-.flash-toast.success {
-  background: #d1fae5;
-  color: #065f46;
-  border: 1px solid #6ee7b7;
-}
-
-.flash-toast.error {
-  background: #fee2e2;
-  color: #991b1b;
-  border: 1px solid #fca5a5;
-}
-
+/* ----------------------------------------------------------
+   Stat Cards Grid (Overview)
+   ---------------------------------------------------------- */
 .stat-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
   margin-bottom: 2rem;
 }
 
 .stat-card {
-  background: var(--pico-card-background-color);
-  border: 1px solid var(--pico-muted-border-color);
-  border-radius: 8px;
-  padding: 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-card);
+  transition: transform var(--transition), box-shadow var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--accent-green);
+  border-radius: 0 4px 4px 0;
+}
+
+.stat-card:nth-child(2n)::before {
+  background: var(--accent-orange);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
 }
 
 .stat-card .label {
-  font-size: 0.8rem;
-  color: var(--pico-muted-color);
+  font-size: 0.75rem;
+  color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
+  font-weight: 600;
 }
 
 .stat-card .value {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-top: 0.25rem;
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-top: 0.35rem;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+/* ----------------------------------------------------------
+   Tables — Dark rounded container
+   ---------------------------------------------------------- */
+.table-wrap {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
 }
 
 table {
   width: 100%;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  border-collapse: collapse;
+  color: var(--text-primary);
 }
 
+thead {
+  background: var(--bg-table-head);
+}
+
+thead th {
+  padding: 0.85rem 1rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  text-align: left;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+tbody tr {
+  background: var(--bg-table-row);
+  transition: background var(--transition);
+}
+
+tbody tr:nth-child(even) {
+  background: var(--bg-table-alt);
+}
+
+tbody tr:hover {
+  background: var(--bg-card-hover);
+}
+
+tbody td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: middle;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ----------------------------------------------------------
+   Add / Edit Forms
+   ---------------------------------------------------------- */
 .add-form {
   margin-bottom: 1.5rem;
-  padding: 1rem;
-  background: var(--pico-card-background-color);
-  border: 1px solid var(--pico-muted-border-color);
-  border-radius: 8px;
+  padding: 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
 }
 
 .add-form h3 {
   margin-top: 0;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
   font-size: 1rem;
-}
-
-.add-form .form-row {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  align-items: flex-end;
-}
-
-.add-form .form-row input,
-.add-form .form-row textarea,
-.add-form .form-row select {
-  margin-bottom: 0;
-  flex: 1;
-  min-width: 140px;
-}
-
-.add-form .form-row textarea {
-  min-height: 60px;
-}
-
-.btn-sm {
-  padding: 0.3rem 0.75rem;
-  font-size: 0.8rem;
-  white-space: nowrap;
-}
-
-.badge {
-  display: inline-block;
-  padding: 0.2em 0.6em;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: capitalize;
-}
-
-.badge-pending    { background: #fef3c7; color: #92400e; }
-.badge-confirmed  { background: #dbeafe; color: #1e40af; }
-.badge-cancelled  { background: #fee2e2; color: #991b1b; }
-.badge-completed  { background: #d1fae5; color: #065f46; }
-.badge-no_show    { background: #f3e8ff; color: #6b21a8; }
-.badge-active     { background: #dbeafe; color: #1e40af; }
-.badge-escalated  { background: #fef3c7; color: #92400e; }
-.badge-closed     { background: #f3f4f6; color: #374151; }
-
-.page-header {
+  color: var(--text-primary);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.add-form h3::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 18px;
+  background: var(--accent-green);
+  border-radius: 2px;
+}
+
+/* Form grid: 2-3 columns instead of a single horizontal row */
+.add-form .form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
   margin-bottom: 1rem;
 }
 
-.page-header h2 {
-  margin: 0;
+/* Legacy .form-row still supported for pages that use it */
+.add-form .form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+  align-items: end;
 }
 
-.htmx-indicator {
-  display: none;
+.add-form .form-row .form-submit-row {
+  grid-column: 1 / -1;
 }
 
-.htmx-request .htmx-indicator {
-  display: inline;
+/* Input fields */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="number"],
+input[type="search"],
+input[type="url"],
+select,
+textarea {
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  background: var(--bg-input);
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--accent-green);
+  box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.15);
+}
+
+select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236b6b7b' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  padding-right: 2rem;
+}
+
+select option {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+textarea {
+  min-height: 70px;
+  resize: vertical;
+}
+
+label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.3rem;
+}
+
+/* Inline form elements in table cells */
+td input, td select, td textarea {
+  margin-bottom: 0;
+  padding: 0.35rem 0.55rem;
+  font-size: 0.8rem;
 }
 
 td .form-row {
@@ -203,8 +480,336 @@ td .form-row {
   align-items: center;
 }
 
-td input, td select, td textarea {
-  margin-bottom: 0;
-  padding: 0.3rem 0.5rem;
+/* ----------------------------------------------------------
+   Buttons
+   ---------------------------------------------------------- */
+button,
+.btn {
+  font-family: var(--font-sans);
   font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.55rem 1.2rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  line-height: 1.4;
+}
+
+/* Primary button (green) */
+button[type="submit"],
+button.primary,
+.btn-primary {
+  background: var(--accent-green);
+  color: var(--text-on-green);
+}
+
+button[type="submit"]:hover,
+button.primary:hover,
+.btn-primary:hover {
+  background: #22c55e;
+  box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3);
+}
+
+/* Small button */
+.btn-sm {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  border-radius: 6px;
+}
+
+/* Outline button */
+.btn-sm.outline,
+button.outline {
+  background: transparent;
+  border: 1px solid var(--border-input);
+  color: var(--text-secondary);
+}
+
+.btn-sm.outline:hover,
+button.outline:hover {
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+  background: rgba(74, 222, 128, 0.06);
+}
+
+/* Secondary / danger outline */
+.btn-sm.outline.secondary,
+button.outline.secondary {
+  border-color: rgba(248, 113, 113, 0.3);
+  color: var(--accent-red);
+}
+
+.btn-sm.outline.secondary:hover,
+button.outline.secondary:hover {
+  border-color: var(--accent-red);
+  background: rgba(248, 113, 113, 0.08);
+  color: var(--accent-red);
+}
+
+/* Logout button override */
+button.btn-logout {
+  background: transparent;
+  border: 1px solid var(--border-input);
+  color: var(--text-secondary);
+  padding: 0.3rem 0.85rem;
+  font-size: 0.8rem;
+  border-radius: var(--radius-sm);
+}
+
+button.btn-logout:hover {
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+  background: rgba(248, 113, 113, 0.06);
+}
+
+/* ----------------------------------------------------------
+   Status Badges
+   ---------------------------------------------------------- */
+.badge {
+  display: inline-block;
+  padding: 0.25em 0.7em;
+  border-radius: var(--radius-pill);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+}
+
+.badge-pending    { background: rgba(251, 146, 60, 0.15);  color: var(--accent-orange); }
+.badge-confirmed  { background: rgba(96, 165, 250, 0.15);  color: var(--accent-blue); }
+.badge-cancelled  { background: rgba(248, 113, 113, 0.15); color: var(--accent-red); }
+.badge-completed  { background: rgba(74, 222, 128, 0.15);  color: var(--accent-green); }
+.badge-no_show    { background: rgba(192, 132, 252, 0.15); color: var(--accent-purple); }
+.badge-active     { background: rgba(96, 165, 250, 0.15);  color: var(--accent-blue); }
+.badge-escalated  { background: rgba(251, 146, 60, 0.15);  color: var(--accent-orange); }
+.badge-closed     { background: rgba(107, 107, 123, 0.15); color: var(--text-muted); }
+
+/* Role badges */
+.badge-super_admin { background: rgba(192, 132, 252, 0.15); color: var(--accent-purple); }
+.badge-clinic_admin { background: rgba(96, 165, 250, 0.15); color: var(--accent-blue); }
+
+/* ----------------------------------------------------------
+   Active indicator (replaces emoji checkmarks)
+   ---------------------------------------------------------- */
+.status-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  vertical-align: middle;
+}
+.status-dot.active   { background: var(--accent-green); box-shadow: 0 0 6px rgba(74,222,128,0.4); }
+.status-dot.inactive { background: var(--accent-red); opacity: 0.6; }
+
+/* ----------------------------------------------------------
+   Toast Notifications
+   ---------------------------------------------------------- */
+#toast-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+  min-width: 300px;
+}
+
+.flash-toast {
+  padding: 0.85rem 1.15rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  animation: slideIn 0.3s ease;
+  box-shadow: var(--shadow-lg);
+}
+
+.flash-toast.success {
+  background: rgba(74, 222, 128, 0.15);
+  color: var(--accent-green);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.flash-toast.error {
+  background: rgba(248, 113, 113, 0.15);
+  color: var(--accent-red);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+/* ----------------------------------------------------------
+   Filter bar (Appointments)
+   ---------------------------------------------------------- */
+.filter-bar {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.filter-bar label {
+  margin: 0;
+  white-space: nowrap;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.filter-bar select {
+  width: auto;
+  margin: 0;
+  min-width: 140px;
+}
+
+/* ----------------------------------------------------------
+   Empty states
+   ---------------------------------------------------------- */
+.empty-state {
+  color: var(--text-muted);
+  margin-top: 1.5rem;
+  padding: 2rem;
+  text-align: center;
+  background: var(--bg-card);
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+}
+
+/* ----------------------------------------------------------
+   Section heading (inside content area, e.g. "Recent Appointments")
+   ---------------------------------------------------------- */
+.section-heading {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--bg-sidebar);
+  margin: 1.5rem 0 1rem;
+}
+
+/* ----------------------------------------------------------
+   HTMX loading indicator
+   ---------------------------------------------------------- */
+.htmx-indicator {
+  display: none;
+}
+
+.htmx-request .htmx-indicator {
+  display: inline;
+}
+
+/* ----------------------------------------------------------
+   Login Page
+   ---------------------------------------------------------- */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-page);
+  padding: 2rem;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  box-shadow: var(--shadow-lg);
+}
+
+.login-card .login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-card .login-header .login-icon {
+  width: 48px;
+  height: 48px;
+  background: var(--accent-green);
+  border-radius: var(--radius-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.login-card .login-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--text-primary);
+}
+
+.login-card .login-header p {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin: 0.35rem 0 0 0;
+}
+
+.login-card form label {
+  margin-bottom: 0.3rem;
+}
+
+.login-card form input {
+  margin-bottom: 1rem;
+}
+
+.login-card form button[type="submit"] {
+  width: 100%;
+  padding: 0.7rem;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+/* ----------------------------------------------------------
+   Monospace cells (IDs, slugs)
+   ---------------------------------------------------------- */
+td.mono {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* ----------------------------------------------------------
+   Responsive
+   ---------------------------------------------------------- */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 60px;
+    padding: 1rem 0.4rem;
+  }
+
+  .sidebar ul li a span:not(.nav-icon) {
+    display: none;
+  }
+
+  .sidebar .nav-section {
+    font-size: 0;
+    margin: 0.75rem 0;
+    border-top: 1px solid var(--border-subtle);
+    padding: 0;
+  }
+
+  .main-content {
+    padding: 1.25rem;
+  }
+
+  .stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .add-form .form-row {
+    grid-template-columns: 1fr;
+  }
 }
